@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Земеделски регистър</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        
+        .search-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-field {
+            flex: 1;
+        }
+        
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-field input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        
+        .address-field {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .address-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .address-field input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        
+        .table-section {
+            margin-bottom: 25px;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .table-title {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn-add-row {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .summary-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .summary-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .summary-label {
+            font-weight: bold;
+            min-width: 100px;
+        }
+        
+        .summary-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .summary-field input {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Земеделски регистър</h1>
+        
+        <!-- Search Section -->
+        <div class="search-section">
+            <h3>Търсене</h3>
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="searchId">ID:</label>
+                    <input type="number" id="searchId" placeholder="Въведете ID">
+                </div>
+                <div class="form-field">
+                    <label for="searchName">Име:</label>
+                    <input type="text" id="searchName" placeholder="Въведете име">
+                </div>
+            </div>
+            <div class="search-buttons">
+                <button class="btn btn-primary" onclick="searchRecord()">Търси</button>
+                <button class="btn btn-secondary" onclick="clearForm()">Изчисти</button>
+            </div>
+        </div>
+
+                <!-- Parcels Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <div class="table-title">Бързо Намиране</div>
+            </div>
+            <table id="QuickInfoTable">
+                <thead>
+                    <tr>
+                        <th>Име</th>
+                        <th>ЕГН</th>
+                    </tr>
+                </thead>
+                <tbody id="quickInfoTableBody">
+                    <!-- Rows will be populated from database -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Personal Information -->
+        <div class="form-section">
+            <h3>Лични данни</h3>
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="gsm">Телефонен номер:</label>
+                    <input type="tel" id="gsm" placeholder="Tелефон номер" readonly>
+                </div>
+                <div class="form-field">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" placeholder="Въведете email" readonly>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Address -->
+        <div class="form-section">
+            <h3>Address</h3>
+            <div class="address-field">
+                <label for="address1">Address:</label>
+                <input type="text" id="address1" placeholder="Въведете адрес" readonly>
+            </div>
+                <div class="address-field">
+                <label for="address2">Contact address:</label>
+                <input type="text" id="address2" placeholder="Въведете контакт адрес" readonly>
+            </div>
+        </div>
+        
+        <!-- Parcels Table -->
+        <div class="table-section">
+            <div class="table-header">
+                <div class="table-title">Земеделски парцели</div>
+            </div>
+            <table id="plotsTable">
+                <thead>
+                    <tr>
+                        <th>Номер на парцел</th>
+                        <th>Тип</th>
+                        <th>Обща площ</th>
+                        <th>Процент от дял</th>
+                        <th>Площа на дял</th>
+                    </tr>
+                </thead>
+                <tbody id="plotsTableBody">
+                    <!-- Rows will be populated from database -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Initialize empty form
+        document.addEventListener('DOMContentLoaded', function() {
+            clearForm();
+        });
+
+        function searchRecord() {
+            const searchId = document.getElementById('searchId').value;
+            const searchName = document.getElementById('searchName').value;
+            
+            if (!searchId && !searchName) {
+                alert('Моля въведете ID или име за търсене');
+                return;
+            }
+            
+            // Make AJAX call to PHP backend
+            fetch('search.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: searchId,
+                    name: searchName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    populateForm(data.record);
+                } else {
+                    alert(data.message || 'Записът не е намерен');
+                    clearForm();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Грешка при търсене');
+                clearForm();
+            });
+        }
+
+        function populateForm(record) {
+            // Fill personal information
+            document.getElementById('gsm').value = record.gsm || '';
+            document.getElementById('email').value = record.email || '';
+            document.getElementById('address1').value = record.address1 || '';
+            document.getElementById('address2').value = record.address2 || '';
+            // Sync search inputs with returned record
+            document.getElementById('searchId').value = record.id || '';
+            document.getElementById('searchName').value = record.name || '';
+            
+            // Clear existing table rows
+            const tbody = document.getElementById('plotsTableBody');
+            tbody.innerHTML = '';
+            
+            // Add rows for each plot
+            if (record.plots && record.plots.length > 0) {
+                record.plots.forEach(plot => {
+                    addPlotRow(plot);
+                });
+            } else {
+                // Add one empty row if no plots
+                addPlotRow();
+            }
+
+            // Render Quick Info (list of persons by ID prefix)
+            const qtbody = document.getElementById('quickInfoTableBody');
+            qtbody.innerHTML = '';
+            if (record.quickInfo && Array.isArray(record.quickInfo) && record.quickInfo.length > 0) {
+                record.quickInfo.forEach(item => addQuickInfoRow(item));
+            } else {
+                const empty = document.createElement('tr');
+                empty.innerHTML = `<td colspan="2">Няма резултати</td>`;
+                qtbody.appendChild(empty);
+            }
+            
+            updateSummary();
+        }
+
+        function addPlotRow(plot = null) {
+            const tbody = document.getElementById('plotsTableBody');
+            const row = document.createElement('tr');
+            
+            const plotId = plot ? (plot.plot_id ?? '') : '';
+            const usage = plot ? (plot.usage ?? '') : '';
+            const area = plot ? (plot.area ?? '') : '';
+            const shareRaw = plot ? (plot.share ?? '') : '';
+            const sharePercent = typeof shareRaw === 'number' ? (shareRaw * 100).toFixed(2) + '%' : (shareRaw !== '' ? shareRaw : '');
+            const shareArea = plot ? (plot.total_share_area ?? '') : '';
+            const test = plot ? (plot.test ?? '') : '';
+
+            row.innerHTML = `
+                <td>${plotId}</td>
+                <td>${usage}</td>
+                <td>${area}</td>
+                <td>${sharePercent}</td>
+                <td>${shareArea}</td>
+                <td>${test}</td>
+            `;
+            tbody.appendChild(row);
+        }
+        
+        function addQuickInfoRow(item = null) {
+            const tbody = document.getElementById('quickInfoTableBody');
+            const row = document.createElement('tr');
+            const id = item ? (item.id ?? '') : '';
+            const name = item ? (item.name ?? '') : '';
+            row.style.cursor = 'pointer';
+            row.title = 'Попълни полетата за търсене';
+            row.innerHTML = `
+            <td>${name}</td>
+            <td>${id}</td>
+            `;
+            row.onclick = () => {
+                const searchId = document.getElementById('searchId');
+                const searchName = document.getElementById('searchName');
+                if (searchId) searchId.value = id;
+                if (searchName) searchName.value = name;
+            };
+            tbody.appendChild(row);
+        }
+
+        function updateSummary() {
+            const rows = document.querySelectorAll('#plotsTableBody tr');
+            let niviTotal = 0;
+            let livadiTotal = 0;
+
+            // If summary inputs are not present, skip calculations
+            const niviInput = document.getElementById('nivi');
+            const livadiInput = document.getElementById('livadi');
+            if (!niviInput || !livadiInput) {
+                return;
+            }
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 3) {
+                    const usage = (cells[1].textContent || '').toLowerCase(); // Тип
+                    const area = parseFloat(cells[2].textContent) || 0;       // Обща площ
+                    if (usage === 'ниви') {
+                        niviTotal += area;
+                    } else if (usage === 'ливади') {
+                        livadiTotal += area;
+                    }
+                }
+            });
+
+            niviInput.value = niviTotal.toFixed(2);
+            livadiInput.value = livadiTotal.toFixed(2);
+        }
+
+        function clearForm() {
+            // Clear search fields
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchName').value = '';
+            
+            // Clear form fields
+            document.getElementById('gsm').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('address1').value = '';
+            document.getElementById('address2').value = '';
+            
+            // Clear tables
+            const tbody = document.getElementById('plotsTableBody');
+            tbody.innerHTML = '';
+            const qtbody = document.getElementById('quickInfoTableBody');
+            if (qtbody) qtbody.innerHTML = '';
+            
+            // Clear summary (only if present)
+            const niviInput = document.getElementById('nivi');
+            const livadiInput = document.getElementById('livadi');
+            if (niviInput) niviInput.value = '0.00';
+            if (livadiInput) livadiInput.value = '0.00';
+        }
+    </script>
+</body>
+</html>
